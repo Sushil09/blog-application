@@ -9,7 +9,7 @@ public interface CommentService {
 
     CommentDto saveComment(long postId, CommentDto commentDto);
 
-    CommentDto getCommentById(long commentId);
+    CommentDto getCommentById(long postId, long commentId);
 
     CommentDto updateComment(long commentId, CommentDto commentDto);
 
