@@ -4,15 +4,19 @@ import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.service.PostService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
-
 
 import static com.springboot.blog.utils.AppConstants.*;
 
+@EnableMethodSecurity
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class PostController {
 
     private PostService postService;
@@ -22,6 +26,7 @@ public class PostController {
     }
 
     @PostMapping("/posts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
         PostDto fetchedPost = postService.createPost(postDto);
         return new ResponseEntity<>(fetchedPost, HttpStatus.CREATED);
@@ -42,12 +47,14 @@ public class PostController {
     }
 
     @PutMapping("/posts/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto, @PathVariable("id") Long id) {
         PostDto returnedPost = postService.updatePost(postDto, id);
         return new ResponseEntity<>(returnedPost, HttpStatus.OK);
     }
 
     @DeleteMapping("/posts/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PostDto> deletePostById(@PathVariable("id") Long id) {
         return new ResponseEntity<>(postService.deletePost(id), HttpStatus.OK);
     }
