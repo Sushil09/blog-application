@@ -1,4 +1,4 @@
-package com.springboot.blog.service;
+package com.springboot.blog.service.impl;
 
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.dto.PostMapper;
@@ -6,6 +6,7 @@ import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.repository.PostRepository;
+import com.springboot.blog.service.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
