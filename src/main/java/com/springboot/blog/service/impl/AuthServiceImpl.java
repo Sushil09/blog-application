@@ -7,6 +7,7 @@ import com.springboot.blog.payload.LoginDto;
 import com.springboot.blog.payload.RegisterDto;
 import com.springboot.blog.repository.RoleRepository;
 import com.springboot.blog.repository.UserRepository;
+import com.springboot.blog.security.JwtTokenProvider;
 import com.springboot.blog.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,18 +26,22 @@ import java.util.Set;
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private static PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    private JwtTokenProvider jwtTokenProvider;
 
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -46,8 +51,11 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(loginDto.getUserNameOrEmail(),
                 loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = jwtTokenProvider.generateToken(authentication);
+
         log.info("Security context: {}",SecurityContextHolder.getContext());
-        return "Logged-in successfully";
+        return token;
 
     }
 
@@ -73,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
         return "User Registered Successfully !!";
     }
 
-    private static void mapUserDtoToUser(RegisterDto registerDto, User user) {
+    private void mapUserDtoToUser(RegisterDto registerDto, User user) {
         user.setName(registerDto.getName());
         user.setUserName(registerDto.getUserName());
         user.setEmail(registerDto.getEmail());
