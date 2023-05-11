@@ -3,7 +3,10 @@ package com.springboot.blog.controller;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ import static com.springboot.blog.utils.AppConstants.*;
 @RestController
 @RequestMapping("/api/posts")
 @Slf4j
+@Tag(name = "CRUD REST APIs for Post Resource")
 public class PostController {
 
     private PostService postService;
@@ -28,6 +32,9 @@ public class PostController {
         this.postService = postService;
     }
 
+    @Operation(summary = "Create POST REST API",
+            description = "Used to save post into database")
+    @ApiResponse(responseCode = "201", description = "Http Status 201 Created")
     @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
@@ -36,6 +43,9 @@ public class PostController {
         return new ResponseEntity<>(fetchedPost, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get all POST REST API",
+            description = "Used to fetch all posts from database")
+    @ApiResponse(responseCode = "200", description = "Http Status 200 Success")
     @GetMapping("")
     public ResponseEntity<PostResponse> getAllPosts(@RequestParam(defaultValue = DEFAULT_PAGE_NUMBER, required = false, value = "pageNumber") int pageNumber,
                                                     @RequestParam(defaultValue = DEFAULT_PAGE_SIZE, required = false, value = "pageSize") int pageSize,
@@ -45,11 +55,17 @@ public class PostController {
         return new ResponseEntity<>(postService.getAllPosts(pageNumber, pageSize, sortBy, sortOrder), HttpStatus.OK);
     }
 
+    @Operation(summary = "GET POST by id REST API",
+            description = "Used to fetch a post by Id from database")
+    @ApiResponse(responseCode = "200", description = "Http Status 200 Success")
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPost(@PathVariable("id") Long id) {
         return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
     }
 
+    @Operation(summary = "UPDATE POST by id REST API",
+            description = "Used to update a post by Id from database")
+    @ApiResponse(responseCode = "200", description = "Http Status 200 Success")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
@@ -58,6 +74,9 @@ public class PostController {
         return new ResponseEntity<>(returnedPost, HttpStatus.OK);
     }
 
+    @Operation(summary = "DELETE POST by id REST API",
+            description = "Used to delete a post by Id from database")
+    @ApiResponse(responseCode = "200", description = "Http Status 200 Success")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
