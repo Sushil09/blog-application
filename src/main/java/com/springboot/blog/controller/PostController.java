@@ -11,11 +11,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.springboot.blog.utils.AppConstants.*;
 
 @EnableMethodSecurity
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/posts")
 @Slf4j
 public class PostController {
 
@@ -25,14 +27,14 @@ public class PostController {
         this.postService = postService;
     }
 
-    @PostMapping("/posts")
+    @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
         PostDto fetchedPost = postService.createPost(postDto);
         return new ResponseEntity<>(fetchedPost, HttpStatus.CREATED);
     }
 
-    @GetMapping("/posts")
+    @GetMapping("")
     public ResponseEntity<PostResponse> getAllPosts(@RequestParam(defaultValue = DEFAULT_PAGE_NUMBER, required = false, value = "pageNumber") int pageNumber,
                                                     @RequestParam(defaultValue = DEFAULT_PAGE_SIZE, required = false, value = "pageSize") int pageSize,
                                                     @RequestParam(defaultValue = DEFAULT_SORT_BY, required = false, value = "sortBy") String sortBy,
@@ -41,21 +43,26 @@ public class PostController {
         return new ResponseEntity<>(postService.getAllPosts(pageNumber, pageSize, sortBy, sortOrder), HttpStatus.OK);
     }
 
-    @GetMapping("/posts/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPost(@PathVariable("id") Long id) {
         return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
     }
 
-    @PutMapping("/posts/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto, @PathVariable("id") Long id) {
         PostDto returnedPost = postService.updatePost(postDto, id);
         return new ResponseEntity<>(returnedPost, HttpStatus.OK);
     }
 
-    @DeleteMapping("/posts/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PostDto> deletePostById(@PathVariable("id") Long id) {
         return new ResponseEntity<>(postService.deletePost(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/category/{Id}")
+    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable("Id") Long categoryId) {
+        return new ResponseEntity<>(postService.getPostsByCategory(categoryId), HttpStatus.OK);
     }
 }
